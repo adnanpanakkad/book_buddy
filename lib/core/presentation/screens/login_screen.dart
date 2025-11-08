@@ -31,13 +31,11 @@ class LoginScreen extends ConsumerWidget {
               color: Colors.green,
               icon: Icons.check_circle,
             );
-            
+
             if (context.mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
               );
             }
           } else {
@@ -49,11 +47,11 @@ class LoginScreen extends ConsumerWidget {
               color: Colors.green,
               icon: Icons.check_circle,
             );
-            
+
             // Clear text fields
             emailController.clear();
             passwordController.clear();
-            
+
             // Switch to login mode
             ref.read(authModeProvider.notifier).state = AuthMode.login;
           }
@@ -92,8 +90,8 @@ class LoginScreen extends ConsumerWidget {
             Center(
               child: Text(
                 mode == AuthMode.login
-                    ? "Login to your\nAdmin"
-                    : "Create your\nAdmin Account",
+                    ? "Login to your\nBook Buddy"
+                    : "Create your\nBook Buddy Account",
                 textAlign: TextAlign.center,
                 style: CustomTextStyle.ultraBoldTextstyle,
               ),
@@ -106,55 +104,53 @@ class LoginScreen extends ConsumerWidget {
                   CustomTextfield(
                     hintText: "Enter Your Email",
                     controller: emailController,
-                    validation:
-                        (value) => ref
-                            .read(authRepositoryProvider)
-                            .validateEmail(value),
+                    validation: (value) =>
+                        ref.read(authRepositoryProvider).validateEmail(value),
                   ),
                   CustomTextfield(
                     hintText: "Enter Your Password",
                     controller: passwordController,
-                    validation:
-                        (value) => ref
-                            .read(authRepositoryProvider)
-                            .validatePassword(value),
+                    validation: (value) => ref
+                        .read(authRepositoryProvider)
+                        .validatePassword(value),
                   ),
                   const SizedBox(height: 20),
                   authState.isLoading
                       ? const CircularProgressIndicator()
                       : CustomButton(
-                        text: mode == AuthMode.login ? 'Login' : 'Sign Up',
-                        onTap: () async {
-                          if (_formKey.currentState!.validate()) {
-                            if (mode == AuthMode.login) {
-                              await ref
-                                  .read(authControllerProvider.notifier)
-                                  .login(
-                                    emailController.text.trim(),
-                                    passwordController.text.trim(),
-                                  );
-                            } else {
-                              await ref
-                                  .read(authControllerProvider.notifier)
-                                  .signin(
-                                    emailController.text.trim(),
-                                    passwordController.text.trim(),
-                                  );
+                          text: mode == AuthMode.login ? 'Login' : 'Sign Up',
+                          onTap: () async {
+                            if (_formKey.currentState!.validate()) {
+                              if (mode == AuthMode.login) {
+                                await ref
+                                    .read(authControllerProvider.notifier)
+                                    .login(
+                                      emailController.text.trim(),
+                                      passwordController.text.trim(),
+                                    );
+                              } else {
+                                await ref
+                                    .read(authControllerProvider.notifier)
+                                    .signin(
+                                      emailController.text.trim(),
+                                      passwordController.text.trim(),
+                                    );
+                              }
                             }
-                          }
-                        },
-                      ),
+                          },
+                        ),
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
                       // Clear fields when switching modes
                       emailController.clear();
                       passwordController.clear();
-                      
-                      ref.read(authModeProvider.notifier).state =
-                          mode == AuthMode.login
-                              ? AuthMode.signup
-                              : AuthMode.login;
+
+                      ref
+                          .read(authModeProvider.notifier)
+                          .state = mode == AuthMode.login
+                          ? AuthMode.signup
+                          : AuthMode.login;
                     },
                     child: Text(
                       mode == AuthMode.login
