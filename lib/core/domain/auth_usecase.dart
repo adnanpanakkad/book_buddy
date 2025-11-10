@@ -13,5 +13,7 @@ class AuthUseCases {
     await repository.registerUser(email: email, password: password);
   }
 
+  Future<void> logout() async => await repository.signOut();
+
   Stream authStateChanges() => repository.authStateChanges();
 }

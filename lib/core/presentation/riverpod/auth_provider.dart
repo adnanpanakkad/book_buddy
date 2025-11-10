@@ -34,7 +34,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
   final AuthUseCases useCases;
   AuthController(this.useCases) : super(const AsyncData(null));
 
-  Future<void> login(String email, String password) async {
+  Future<void> userLogin(String email, String password) async {
     state = const AsyncLoading();
     try {
       await useCases.login(email, password);
@@ -44,7 +44,7 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<void> signin(String email, String password) async {
+  Future<void> userSignin(String email, String password) async {
     state = const AsyncLoading();
     try {
       await useCases.register(email, password);
@@ -52,5 +52,9 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  Future<void> userLogout() async {
+    await useCases.logout();
   }
 }

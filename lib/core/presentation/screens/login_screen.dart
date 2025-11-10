@@ -1,4 +1,5 @@
 import 'package:book_buddy/core/presentation/riverpod/auth_provider.dart';
+import 'package:book_buddy/core/presentation/screens/bottombar_screens.dart';
 import 'package:book_buddy/core/presentation/widgets/common/custom_snackbar.dart';
 import 'package:book_buddy/core/presentation/widgets/common/text_styles.dart';
 import 'package:book_buddy/core/presentation/widgets/login/custom_button.dart';
@@ -32,12 +33,14 @@ class LoginScreen extends ConsumerWidget {
               icon: Icons.check_circle,
             );
 
-            if (context.mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-              );
-            }
+            // if (context.mounted) {
+            //   Navigator.pushReplacement(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => const BottombarScreens(),
+            //     ),
+            //   );
+            // }
           } else {
             // Signup successful - switch to login mode
             CustomSnackbar.show(
@@ -124,14 +127,14 @@ class LoginScreen extends ConsumerWidget {
                               if (mode == AuthMode.login) {
                                 await ref
                                     .read(authControllerProvider.notifier)
-                                    .login(
+                                    .userLogin(
                                       emailController.text.trim(),
                                       passwordController.text.trim(),
                                     );
                               } else {
                                 await ref
                                     .read(authControllerProvider.notifier)
-                                    .signin(
+                                    .userSignin(
                                       emailController.text.trim(),
                                       passwordController.text.trim(),
                                     );
