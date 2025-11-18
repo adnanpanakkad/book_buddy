@@ -9,7 +9,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const CustomAppBar({
     super.key,
-    this.title = 'Book Buddy',
+    this.title = 'Books Buddy',
     this.onCartPressed,
   });
 
@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
+    return AppBar( 
       backgroundColor: Appcolor.lightcolor,
       elevation: 0,
       leadingWidth: 170,
