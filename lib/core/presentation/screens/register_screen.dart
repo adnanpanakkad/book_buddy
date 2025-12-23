@@ -114,15 +114,54 @@ class RegisterScreen extends ConsumerWidget {
                       ? const CircularProgressIndicator()
                       : CustomButton(
                           text: 'Sign Up',
+                          // onTap: () async {
+                          //   if (_formKey.currentState!.validate()) {
+                          //     await ref
+                          //         .read(authControllerProvider.notifier)
+                          //         .userSignin(
+                          //           nameController.text.trim(),
+                          //           emailController.text.trim(),
+                          //           passwordController.text.trim(),
+                          //         );
+                          //   }
+                          // },
                           onTap: () async {
                             if (_formKey.currentState!.validate()) {
-                              await ref
-                                  .read(authControllerProvider.notifier)
-                                  .userSignin(
-                                    nameController.text.trim(),
-                                    emailController.text.trim(),
-                                    passwordController.text.trim(),
+                              try {
+                                await ref
+                                    .read(authControllerProvider.notifier)
+                                    .userSignin(
+                                      nameController.text.trim(),
+                                      emailController.text.trim(),
+                                      passwordController.text.trim(),
+                                    );
+
+                                // Show success snackbar
+                                if (context.mounted) {
+                                  CustomSnackbar.show(
+                                    context: context,
+                                    title: 'Success',
+                                    subtitle:
+                                        'Registration successful! Please login.',
+                                    color: Colors.green,
+                                    icon: Icons.check_circle,
                                   );
+                                  
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  CustomSnackbar.show(
+                                    context: context,
+                                    title: 'Error',
+                                    subtitle: e.toString().replaceFirst(
+                                      'Exception: ',
+                                      '',
+                                    ),
+                                    color: Colors.red,
+                                    icon: Icons.error,
+                                  );
+                                }
+                              }
                             }
                           },
                         ),

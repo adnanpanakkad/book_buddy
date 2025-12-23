@@ -7,8 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthMode { login, signup }
 
-final authModeProvider =
-    StateProvider<AuthMode>((ref) => AuthMode.login);
+final authModeProvider = StateProvider<AuthMode>((ref) => AuthMode.login);
 
 // Dio Provider
 final dioProvider = Provider<Dio>((ref) {
@@ -21,14 +20,12 @@ final dioProvider = Provider<Dio>((ref) {
 });
 
 // Secure Storage Provider
-final secureStorageProvider =
-    Provider<FlutterSecureStorage>((ref) {
+final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage();
 });
 
 // Repository Provider
-final authRepositoryProvider =
-    Provider<AuthenticationRepository>((ref) {
+final authRepositoryProvider = Provider<AuthenticationRepository>((ref) {
   return AuthenticationRepository(
     ref.watch(dioProvider),
     ref.watch(secureStorageProvider),
@@ -48,10 +45,8 @@ final authStateProvider = StreamProvider<bool>((ref) {
 // Controller
 final authControllerProvider =
     StateNotifierProvider<AuthController, AsyncValue<void>>((ref) {
-  return AuthController(ref.watch(authUseCaseProvider));
-});
-
-
+      return AuthController(ref.watch(authUseCaseProvider));
+    });
 
 class AuthController extends StateNotifier<AsyncValue<void>> {
   final AuthUseCases useCases;
@@ -65,20 +60,18 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
+      rethrow;
     }
   }
 
-  Future<void> userSignin(
-    String name,
-    String email,
-    String password,
-  ) async {
+  Future<void> userSignin(String name, String email, String password) async {
     state = const AsyncLoading();
     try {
       await useCases.register(name, email, password);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
+      rethrow;
     }
   }
 

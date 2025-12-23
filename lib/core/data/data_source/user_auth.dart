@@ -1,6 +1,9 @@
 import 'dart:developer';
 
+import 'package:book_buddy/core/presentation/screens/bottombar_screens.dart';
+import 'package:book_buddy/core/presentation/widgets/common/custom_snackbar.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthenticationRepository {
@@ -55,6 +58,47 @@ class AuthenticationRepository {
   }
 
   // 🔐 REGISTER (Does NOT store token)
+  // Future<void> registerUser({
+  //   required String name,
+  //   required String email,
+  //   required String password,
+  // }) async {
+  //   try {
+  //     log('📝 Registering user: $email');
+
+  //     final response = await _dio.post(
+  //       '/auth/register',
+  //       data: {"name": name, "email": email, "password": password},
+  //     );
+
+  //     // Check if registration was successful
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       log('✅ Registration successful');
+  //       log('📋 Response: ${response.data}');
+
+  //       // ⚠️ DO NOT store token after registration
+  //       // User must login separately to get the token stored
+  //     } else {
+  //       throw Exception(response.data['message'] ?? 'Registration failed');
+  //     }
+  //   } on DioException catch (e) {
+  //     log('❌ Registration error: ${e.message}');
+
+  //     if (e.response != null) {
+  //       final message =
+  //           e.response?.data['message'] ??
+  //           e.response?.data['error'] ??
+  //           'Registration failed';
+  //       throw Exception(message);
+  //     } else {
+  //       // Network error or timeout
+  //       throw Exception('Network error. Please check your connection.');
+  //     }
+  //   } catch (e) {
+  //     log('❌ Unexpected error: $e');
+  //     throw Exception('An unexpected error occurred');
+  //   }
+  // }
   Future<void> registerUser({
     required String name,
     required String email,
@@ -75,17 +119,25 @@ class AuthenticationRepository {
 
         // ⚠️ DO NOT store token after registration
         // User must login separately to get the token stored
-      } else {
-        throw Exception(response.data['message'] ?? 'Registration failed');
+      }
+      if (response.statusCode == 400 ||
+          response.data?['message'] == 'User already exists with this email') {
+        log('✅ Registration successful');
+        log('📋 Response: ${response.data}');
+        throw Exception(response.data?['message']);
+        // ⚠️ DO NOT store token after registration
+        // User must login separately to get the token stored
       }
     } on DioException catch (e) {
-      log('❌ Registration error: ${e.message}');
+      log('❌ Registration DioException: ${e.message}');
 
+      // Handle 400 and other HTTP error responses
       if (e.response != null) {
         final message =
-            e.response?.data['message'] ??
-            e.response?.data['error'] ??
+            e.response?.data?['message'] ??
+            e.response?.data?['error'] ??
             'Registration failed';
+        log('Server error message: $message');
         throw Exception(message);
       } else {
         // Network error or timeout
@@ -93,11 +145,48 @@ class AuthenticationRepository {
       }
     } catch (e) {
       log('❌ Unexpected error: $e');
+      // Rethrow if it's already a formatted Exception
+      if (e is Exception) {
+        rethrow;
+      }
       throw Exception('An unexpected error occurred');
     }
   }
-
   // 🔐 LOGIN (ONLY this stores the token)
+  // Future<void> loginUser({
+  //   required String email,
+  //   required String password,
+  // }) async {
+  //   try {
+  //     log('Logging in user: $email');
+
+  //     final response = await _dio.post(
+  //       '/auth/login',
+  //       data: {'email': email, 'password': password},
+  //     );
+
+  //     final token = response.data?['data']?['token'];
+
+  //     if (token == null || token.toString().isEmpty) {
+  //       throw Exception('Token not received from server');
+  //     }
+
+  //     await _storage.write(key: _tokenKey, value: token);
+
+  //     log('Login successful, token stored');
+  //   } on DioException catch (e) {
+  //     final message =
+  //         e.response?.data?['message'] ??
+  //         e.response?.data?['error'] ??
+  //         'Login failed';
+
+  //     log('Login error: $message');
+  //     throw Exception(message);
+  //   } catch (e) {
+  //     log('Unexpected login error: $e');
+  //     throw Exception(e.toString());
+  //   }
+  // }
   Future<void> loginUser({
     required String email,
     required String password,
@@ -113,7 +202,12 @@ class AuthenticationRepository {
       final token = response.data?['data']?['token'];
 
       if (token == null || token.toString().isEmpty) {
-        throw Exception('Token not received from server');
+        log('Token not received from server');
+        final errorMessage =
+            response.data?['message'] ??
+            response.data?['error'] ??
+            'Token not received from server';
+        throw Exception(errorMessage);
       }
 
       await _storage.write(key: _tokenKey, value: token);
@@ -123,13 +217,18 @@ class AuthenticationRepository {
       final message =
           e.response?.data?['message'] ??
           e.response?.data?['error'] ??
-          'Login failed';
+          'Login failed. Please try again.';
 
       log('Login error: $message');
       throw Exception(message);
     } catch (e) {
       log('Unexpected login error: $e');
-      throw Exception(e.toString());
+      // Only rethrow if it's already an Exception with our formatted message
+      if (e is Exception) {
+        rethrow;
+      }
+      // For truly unexpected errors, throw a generic message
+      throw Exception('An unexpected error occurred. Please try again.');
     }
   }
 

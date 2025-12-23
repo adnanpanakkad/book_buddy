@@ -88,40 +88,44 @@ class LoginScreen extends ConsumerWidget {
                           onTap: () async {
                             if (!_formKey.currentState!.validate()) return;
 
+                            // In your UI (LoginScreen or Controller)
                             try {
                               await ref
-                                  .read(authControllerProvider.notifier)
-                                  .userLogin(
-                                    emailController.text.trim(),
-                                    passwordController.text.trim(),
+                                  .read(authUseCaseProvider)
+                                  .login(
+                                    emailController.text,
+                                    passwordController.text,
                                   );
 
-                              if (!context.mounted) return;
+                              if (context.mounted) {
+                                CustomSnackbar.show(
+                                  context: context,
+                                  title: 'Success',
+                                  subtitle: 'Login successful',
+                                  color: Colors.green,
+                                  icon: Icons.check_circle,
+                                );
 
-                              CustomSnackbar.show(
-                                context: context,
-                                title: 'Success',
-                                subtitle: 'Login successful',
-                                color: Colors.green,
-                                icon: Icons.check_circle,
-                              );
-
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const BottombarScreens(),
-                                ),
-                              );
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const BottombarScreens(),
+                                  ),
+                                );
+                              }
                             } catch (e) {
-                              if (!context.mounted) return;
-
-                              CustomSnackbar.show(
-                                context: context,
-                                title: 'Error',
-                                subtitle: e.toString(),
-                                color: Colors.red,
-                                icon: Icons.error,
-                              );
+                              if (context.mounted) {
+                                CustomSnackbar.show(
+                                  context: context,
+                                  title: 'Error',
+                                  subtitle: e.toString().replaceFirst(
+                                    'Exception: ',
+                                    '',
+                                  ),
+                                  color: Colors.red,
+                                  icon: Icons.error,
+                                );
+                              }
                             }
                           },
                         ),
